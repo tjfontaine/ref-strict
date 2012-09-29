@@ -1,0 +1,21 @@
+{ "name": "ref-strict"
+, "description": "Add strict typing for ffi types"
+, "keywords": [ "ref", "c", "c++", "ffi" ]
+, "version": "0.0.1"
+, "author": "Timothy J Fontaine <tjfontaine@gmail.com> (http://atxconsulting.com)"
+, "repository": { "type": "git", "url": "git://github.com/tjfontaine/ref-strict.git" }
+, "main": "./lib/strict.js"
+, "scripts": {
+      "test": "mocha -gc --reporter spec"
+  }
+, "dependencies": {
+      "debug": "*"
+    , "ref": "*"
+  }
+, "devDependencies": {
+      "mocha": "*"
+    , "ref-array": "*"
+    , "ref-struct": "*"
+  }
+, "engines": { "node": "*" }
+}
