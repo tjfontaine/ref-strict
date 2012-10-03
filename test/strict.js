@@ -62,6 +62,17 @@ describe('StrictType', function () {
     }, ASSERTION)
     l.printf("%p\n", myType.cast(obj))
   })
+
+  it('should not break alignment', function () {
+    var s = Struct({
+      a: ref.types.uint32,
+    })
+    var ss = StrictType(s);
+    var t = Struct({
+      b: ss,
+    });
+    var st = StrictType(t, 't');
+  })
 })
 
 /*
