@@ -6,7 +6,7 @@
 , "repository": { "type": "git", "url": "git://github.com/tjfontaine/ref-strict.git" }
 , "main": "./lib/strict.js"
 , "scripts": {
-      "test": "mocha -gc --reporter spec"
+      "test": "node-gyp rebuild --directory test && mocha -gc --reporter spec"
   }
 , "dependencies": {
       "debug": "*"

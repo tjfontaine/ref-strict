@@ -3,6 +3,7 @@ var ref = require('ref');
 var Struct = require('ref-struct')
 var StrictType = require('../')
 var ffi = require('ffi')
+var bindings = require('./build/Release/strict_tests')
 
 var ASSERTION = /AssertionError: Value is of wrong type/
 
@@ -73,18 +74,29 @@ describe('StrictType', function () {
     });
     var st = StrictType(t, 't');
   })
+
+  var voidPtr = ref.refType(ref.types.void);
+
+  it('should properly set the type', function () {
+    var test_init = ffi.ForeignFunction(bindings.test_init, voidPtr, [ref.types.int32, ref.types.int32]);
+    var test_cmp = ffi.ForeignFunction(bindings.test_cmp, ref.types.int32, [voidPtr, ref.types.int32, ref.types.int32]);
+    var stype = StrictType(voidPtr);
+
+    var strict_cmp = ffi.ForeignFunction(bindings.test_cmp, ref.types.int32, [stype, ref.types.int32, ref.types.int32]);
+    var strict_init = ffi.ForeignFunction(bindings.test_init, stype, [ref.types.int32, ref.types.int32]);
+
+    var obj = test_init(44, 77);
+    var ret = test_cmp(obj, 44, 77);
+
+    assert(ret);
+
+    ret = strict_cmp(stype.cast(obj), 44, 77);
+
+    assert(ret);
+
+    obj = strict_init(99, 31);
+    ret = strict_cmp(obj, 99, 31);
+
+    assert(ret);
+  })
 })
-
-/*
-var l = ffi.Library(null, {
-  printf: [ref.types.void, [ref.types.CString, ssType]],
-})
-
-var s = new ssType()
-
-assert.throws(function () {
-  l.printf("%p\n", obj)
-}, /AssertionError: Value is of wrong type/)
-
-l.printf("ssType %p\n", s)
-*/
