@@ -40,7 +40,8 @@ describe('StrictType', function () {
     var instance = new s()
     instance.a = null
     instance.a = ref.NULL
-    instance.a = undefined
+    // now that we use ref.set undefined is no longer treated the same as null
+    //instance.a = undefined
   })
 
   it('structs should throw on wrong type', function () {
@@ -60,7 +61,7 @@ describe('StrictType', function () {
     })
     assert.throws(function () {
       l.printf("%p\n", obj)
-    }, ASSERTION)
+    }, /AssertionError: error setting argument 1 - Value is of wrong type/)
     l.printf("%p\n", myType.cast(obj))
   })
 
