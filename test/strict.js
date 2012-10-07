@@ -1,6 +1,7 @@
 var assert = require('assert')
 var ref = require('ref');
 var Struct = require('ref-struct')
+var ArrayType = require('ref-array')
 var StrictType = require('../')
 var ffi = require('ffi')
 var bindings = require('./build/Release/strict_tests')
@@ -98,6 +99,51 @@ describe('StrictType', function () {
     obj = strict_init(99, 31);
     ret = strict_cmp(obj, 99, 31);
 
+    assert(ret);
+  })
+
+  it('should actually make structs in return values', function () {
+    var struct = Struct({
+      a: ref.types.int32,
+      b: ref.types.int32,
+    });
+    var strict_struct = StrictType(struct);
+    var test_struct = ffi.ForeignFunction(bindings.test_struct, struct, [ref.types.int32, ref.types.int32]);
+    var strict_test_struct = ffi.ForeignFunction(bindings.test_struct, strict_struct, [ref.types.int32, ref.types.int32]);
+
+    var obj = test_struct(31, 84);
+    assert.strictEqual(obj.a, 31);
+    assert.strictEqual(obj.b, 84);
+
+    obj = strict_test_struct(35, 73);
+    assert.strictEqual(obj.a, 35);
+    assert.strictEqual(obj.b, 73);
+  })
+
+  it('should handle structs with constant arrays', function () {
+    var struct = Struct({
+      a: ref.types.int32,
+      b: ref.types.int32,
+      data: ArrayType(ref.refType(ref.types.void), 3),
+    });
+    var strict_array = StrictType(struct);
+
+    assert.strictEqual(strict_array.size, struct.size);
+    assert.strictEqual(strict_array.alignment, struct.alignment);
+
+    var struct_arr = ffi.ForeignFunction(bindings.test_struct_arr, struct, [ref.types.int32, ref.types.int32]);
+    var strict_struct_arr = ffi.ForeignFunction(bindings.test_struct_arr, strict_array, [ref.types.int32, ref.types.int32]);
+    var strict_struct_arr_cmp = ffi.ForeignFunction(bindings.test_struct_arr_cmp, ref.types.int32, [strict_array, ref.types.int32, ref.types.int32]);
+
+    var obj = struct_arr(21, 53);
+    assert.strictEqual(obj.a, 21);
+    assert.strictEqual(obj.b, 53);
+
+    obj = strict_struct_arr(16, 74);
+    assert.strictEqual(obj.a, 16);
+    assert.strictEqual(obj.b, 74);
+
+    var ret = strict_struct_arr_cmp(obj, 16, 74);
     assert(ret);
   })
 })
